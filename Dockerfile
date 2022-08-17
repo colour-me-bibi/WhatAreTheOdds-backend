@@ -1,6 +1,9 @@
 FROM python:3.8-slim
 
-# RUN apt-get update && apt-get install -y supervisor wait-for-it
+RUN apt-get update
+RUN apt-get install -y wait-for-it
+
+# RUN apt-get install -y supervisor
 
 WORKDIR /app
 
@@ -9,15 +12,10 @@ RUN pip install -r requirements.txt
 
 COPY . /app/
 
-RUN python manage.py collectstatic --noinput
+EXPOSE 8000 5432
 
-# RUN ./wait-for-it.sh postgres:5432
-# RUN python manage.py migrate
-# RUN python manage.py loaddata fixtures/initial_data.json
+CMD [ "./run.sh" ]
 
-# EXPOSE 8000 5432 6379
+# EXPOSE 6379 # Redis
 
 # CMD [ "/usr/bin/supervisord", "-c", "supervisord.conf" ]
-
-CMD [ "uvicorn", "backend.asgi:application", "--host", "0.0.0.0", "--port", "8000" ]
-# CMD [ "uvicorn", "backend.asgi:application", "--reload", "--host", "0.0.0.0", "--port", "8000" ]

@@ -13,25 +13,22 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+def string_is_truthy(string):
+    return string.lower() in ['true', 'yes', '1']
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+DEBUG = string_is_truthy(os.getenv('DEBUG', 'False'))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+if SECRET_KEY is None:
+    if DEBUG:
+        SECRET_KEY = 'development'
+    else:
+        raise Exception('DJANGO_SECRET_KEY environment variable is not set')
 
-DEBUG = os.getenv('DEBUG', False)
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', "")
-if not DEBUG and not SECRET_KEY:
-    raise Exception("DJANGO_SECRET_KEY environment variable not set")
-
-
-ALLOWED_HOSTS = []
-
-
-# Application definition
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:8000", "http://127.0.0.1:8000"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -41,8 +38,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
-
-    "corsheaders",  # TODO
 
     "rest_framework",
     "rest_framework.authtoken",
@@ -63,17 +58,12 @@ SITE_ID = 1
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-
-    "corsheaders.middleware.CorsMiddleware",  # TODO
-
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-
-CORS_ORIGIN_ALLOW_ALL = True  # TODO
 
 ROOT_URLCONF = "backend.urls"
 
@@ -93,16 +83,10 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "backend.wsgi.application"  # TODO remove?
-
-
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("POSTGRES_DB", "whataretheodds"),
+        "NAME": os.getenv("POSTGRES_DB", "postgres"),
         "USER": os.getenv("POSTGRES_USER", "postgres"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD", "postgres"),
         "HOST": os.getenv("POSTGRES_HOST", "postgres"),
@@ -111,16 +95,13 @@ DATABASES = {
 }
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-# DEFAULT_FROM_EMAIL = "..."
-EMAIL_HOST_PASSWORD = "rwerkhxrzpmzbexr"
-EMAIL_HOST_USER = "bennyforeman1@gmail.com"
+EMAIL_HOST = os.getenv("EMAIL_HOST", "smpt.gmail.com")
+EMAIL_PORT = os.getenv("EMAIL_PORT", "587")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", True)
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
-
-# Password validation
-# https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
+ACCOUNT_EMAIL_VERIFICATION = os.getenv("VERIFY_EMAIL", "optional" if DEBUG else "mandatory" if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD else "none")
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -129,23 +110,13 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.1/topics/i18n/
-
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.1/howto/static-files/
-
-STATIC_URL = "static/"
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "static"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

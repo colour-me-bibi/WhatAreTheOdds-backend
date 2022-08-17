@@ -1,9 +1,9 @@
-*
+# *
 
-!requirements.txt
-!manage.py
-!backend/
-!frontend/
+# !requirements.txt
+# !manage.py
+# !backend/
+# !frontend/
 
-**/__pycache__/
-**/migrations/ # should I include the migrations folder?
+# **/__pycache__/
+# **/migrations/ # should I include the migrations folder?

@@ -1,3 +1,6 @@
+
+from django.contrib import admin
+
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView
 from rest_framework import routers
@@ -13,6 +16,8 @@ router.register(r"investments", InvestmentViewSet, basename="investments")
 urlpatterns = [
     path('', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
+
+    path("admin/", admin.site.urls),
 
     path('auth/', include('dj_rest_auth.urls')),
     path('auth/registration/', include('dj_rest_auth.registration.urls')),
