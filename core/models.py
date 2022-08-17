@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 
 class Tag(models.Model):
     name = models.CharField(max_length=50)
+    # slug = models.SlugField(max_length=50, unique=True)
 
     def __str__(self):
         return self.name
@@ -12,7 +13,7 @@ class Tag(models.Model):
 class Market(models.Model):
     name = models.CharField(max_length=100, unique=True)
     rules = models.TextField()
-    tags = models.ManyToManyField(Tag)
+    tags = models.ManyToManyField(Tag, related_name="markets", blank=True)
     projected_end = models.DateField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -22,7 +23,7 @@ class Market(models.Model):
 
 class Contract(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    market = models.ForeignKey(Market, on_delete=models.CASCADE)
+    market = models.ForeignKey(Market, on_delete=models.CASCADE, related_name="contracts")
 
     # integer from 1 to 99
     latest_yes_price = models.IntegerField(null=True, default=50)
@@ -33,8 +34,8 @@ class Contract(models.Model):
 
 
 class Offer(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    contract = models.ForeignKey(Contract, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="offers")
+    contract = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name="offers")
     quantity = models.IntegerField()
     price = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -60,8 +61,8 @@ class Offer(models.Model):
 
 
 class Investment(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    contract = models.ForeignKey(Contract, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="investments")
+    contract = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name="investments")
     quantity = models.IntegerField()
     price = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)

@@ -46,11 +46,11 @@ class RetrievePortfolioView(RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         user = request.user
 
-        return Response({
+        return Response(self.serializer_class({
             "user": UserDetailsSerializer(user).data,
             'offers': OfferSerializer(Offer.objects.filter(user=user), many=True).data,
             'investments': InvestmentSerializer(Investment.objects.filter(user=user), many=True).data
-        })
+        }).data)
 
 
 @api_view(['POST'])
